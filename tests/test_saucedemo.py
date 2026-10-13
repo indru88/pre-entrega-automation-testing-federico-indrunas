@@ -35,3 +35,22 @@ def test_catalogo(driver):
     print(f"Primer producto: {nombre} - {precio}")
     assert nombre != ""
     assert precio.startswith("$")
+
+
+def test_agregar_al_carrito(driver):
+    hacer_login(driver, USUARIO, PASSWORD)
+
+    primero = esperar_visible(driver, (By.CLASS_NAME, "inventory_item"))
+    nombre = primero.find_element(By.CLASS_NAME, "inventory_item_name").text
+    primero.find_element(By.TAG_NAME, "button").click()
+
+    contador = esperar_visible(driver, (By.CLASS_NAME, "shopping_cart_badge"))
+    assert contador.text == "1"
+
+    driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()
+    esperar_visible(driver, (By.CLASS_NAME, "cart_item"))
+
+    nombres = [
+        el.text for el in driver.find_elements(By.CLASS_NAME, "inventory_item_name")
+    ]
+    assert nombres == [nombre]
